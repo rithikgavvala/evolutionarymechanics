@@ -1,1 +1,1 @@
-# evolutionarymechanics
+# evolutionary mechanics
