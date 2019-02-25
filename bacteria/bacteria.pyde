@@ -11,8 +11,8 @@ class Bacteria:
     enemy_count = ""
     r0 = ""
     rf = ""
-    times;
-    def __init__(self, r: list[int], radius:float, species_color: list[int], divided: boolean, killed: boolean, growth_rate: float):
+    times = []
+    def __init__(self, r, radius, species_color, divided, killed, growth_rate):
         self.r = r
         self.neighborhood = neighborhood
         self.next_position = next_position
@@ -33,16 +33,16 @@ class Bacteria:
         self.r.y = min(height, self.r.y)
         self.r.y = max(0, self.r.y)
         
-        if(self.species_color.x = 255):
-            if(self.trails = 0):
+        if self.species_color.x == 255:
+            if self.trails == 0:
                 fill(self.species_color.x/1.5, self.species_color.y, self.species_color.z+20, 50)
                 stroke(60)
                 pushMatrix()
                 translate(r.x, r.y-10)
                 ellipse(0,0,radius,radies)
                 popMatrix()
-        elif(self.species_color.z = 255):
-            if(self.trails = 0):
+        elif self.species_color.z == 255:
+            if self.trails == 0:
                 fill(self.species_color.x, self.species_color.y, self.species_color.z,60)
                 stroke(60)
                 pushMatrix()
@@ -50,7 +50,7 @@ class Bacteria:
                 ellipse(0,0,radius,radies)
                 popMatrix()
         else:
-            if(trails = 0):
+            if trails == 0:
                 fill(self.species_color.x, self.species_color.y, self.species_color.z)
                 noStroke()
                 pushMatrix()
@@ -65,7 +65,7 @@ class Bacteria:
                 ellipse(0,0,self.radius/4,self.radius/4);
                 popMatrix();  
     def grow():
-        if(self.species_color.y = 0):
+        if self.species_color.y == 0:
             self.radius = self.radius + (2 * pi * dt * self.growth_rate)/self.radius
                 
         
