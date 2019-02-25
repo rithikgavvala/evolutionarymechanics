@@ -1,7 +1,7 @@
 class Bacteria:
     r = ""
-    neighborhood = ""
-    next_position = ""
+    neighborhood = [] # list of Bacterium
+    next_position = PVector() # list of ints representing the position
     radius = ""
     species_color = ""
     divided = ""
@@ -11,10 +11,8 @@ class Bacteria:
     enemy_count = ""
     r0 = ""
     rf = ""
-    long_rheology_list;
     times;
-    bin;
-    def __init__(self, r, radius, species_color, divided, killed, growth_rate):
+    def __init__(self, r: list[int], radius:float, species_color: list[int], divided: boolean, killed: boolean, growth_rate: float):
         self.r = r
         self.neighborhood = neighborhood
         self.next_position = next_position
@@ -26,27 +24,26 @@ class Bacteria:
         self.growth_rate = growth_rate
         self.r0 = PVector(r.x, r.y, r.z)
         self.rf = PVector(0,0,0)
-        self.long_rheology_list = []
-        self.times = []
-        self.bin = 99
+        self.times = [] #list of floats
+    
         
     def show():
-        r.x = min(width, r.x)
-        r.x = max(0, r.x)
-        r.y = min(height, r.y)
-        r.y = max(0, r.y)
+        self.r.x = min(width, self.r.x)
+        self.r.x = max(0, self.r.x)
+        self.r.y = min(height, self.r.y)
+        self.r.y = max(0, self.r.y)
         
-        if(species_color.x = 255):
-            if(trails = 0):
-                fill(species_color.x/1.5, species_color.y, species_color.z+20, 50)
+        if(self.species_color.x = 255):
+            if(self.trails = 0):
+                fill(self.species_color.x/1.5, self.species_color.y, self.species_color.z+20, 50)
                 stroke(60)
                 pushMatrix()
                 translate(r.x, r.y-10)
                 ellipse(0,0,radius,radies)
                 popMatrix()
-        elif(species_color.z = 255):
-            if(trails = 0):
-                fill(species_color.x, species_color.y, species_color.z,60)
+        elif(self.species_color.z = 255):
+            if(self.trails = 0):
+                fill(self.species_color.x, self.species_color.y, self.species_color.z,60)
                 stroke(60)
                 pushMatrix()
                 translate(r.x, r.y-10)
@@ -54,21 +51,21 @@ class Bacteria:
                 popMatrix()
         else:
             if(trails = 0):
-                fill(species_color.x, species_color.y, species_color.z)
+                fill(self.species_color.x, self.species_color.y, self.species_color.z)
                 noStroke()
                 pushMatrix()
-                translate(r.x, r.y-10)
-                ellipse(0,0,radius,radies)
+                translate(self.r.x, self.r.y-10)
+                ellipse(0,0,self.radius, self.radies)
                 popMatrix()
             else:
-                fill(species_color.x,species_color.y, species_color.z);
+                fill(self.species_color.x, self.species_color.y, self.species_color.z);
                 noStroke();
                 pushMatrix();
-                translate(r.x, r.y-10);
-                ellipse(0,0,radius/4,radius/4);
+                translate(self.r.x, self.r.y-10);
+                ellipse(0,0,self.radius/4,self.radius/4);
                 popMatrix();  
     def grow():
-        if(species_color.y = 0):
-            radius = radius + (2 * pi * dt * growth_rate)/radius
+        if(self.species_color.y = 0):
+            self.radius = self.radius + (2 * pi * dt * self.growth_rate)/self.radius
                 
         
