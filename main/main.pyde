@@ -124,22 +124,25 @@ class Grid:
 
 window_width = 1200
 window_height = 400
-cell_radius = 7
+cell_radius = 20 #tweak for bigger or smaller bacteria
 max_num_cells = int((window_height/cell_radius) * (window_width/cell_radius)) 
 film = Biofilm()
 growth_rate = .05
+#amount_of_bacteria = max_num_cells - 500
+amount_of_bacteria = 500
 def setup():
     size(window_width, window_height)
     init()
+    print(max_num_cells)
 def draw():
     line(0,0, mouseX, mouseY)
-    #update()
+    update()
     stroke(255)
     
 def init():
-    for i in range(max_num_cells - 500):
+    for i in range(int(amount_of_bacteria)):
         x = width * random(1)
-        film.bacteria.append(Bacteria(PVector(x, height - height * random(.2), 0), cell_radius, rand_color(x/600), False, False, growth_rate))
+        film.bacteria.append(Bacteria(PVector(x, height - height * random(.2), 0), cell_radius, rand_color(x/int((window_width/2))), False, False, growth_rate))
         
 def rand_color(x):
     return PVector(255, 0, 0) if random(1) > x else PVector(0, 0, 255)
