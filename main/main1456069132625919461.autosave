@@ -14,8 +14,8 @@ class Bacteria:
     times = []
     def __init__(self, r, radius, species_color, divided, killed, growth_rate):
         self.r = r
-        self.neighborhood = []
-        self.next_position = PVector()
+        self.neighborhood = neighborhood
+        self.next_position = next_position
         self.radius = radius;
         self.species_color = species_color
         self.divided = divided 
@@ -25,9 +25,9 @@ class Bacteria:
         self.r0 = PVector(r.x, r.y, r.z)
         self.rf = PVector(0,0,0)
         self.times = [] #list of floats
-        self.trails = 0
+    
         
-    def show(self):
+    def show():
         self.r.x = min(width, self.r.x)
         self.r.x = max(0, self.r.x)
         self.r.y = min(height, self.r.y)
@@ -38,16 +38,16 @@ class Bacteria:
                 fill(self.species_color.x/1.5, self.species_color.y, self.species_color.z+20, 50)
                 stroke(60)
                 pushMatrix()
-                translate(self.r.x, self.r.y-10)
-                ellipse(0,0,self.radius,self.radius)
+                translate(r.x, r.y-10)
+                ellipse(0,0,radius,radies)
                 popMatrix()
         elif self.species_color.z == 255:
             if self.trails == 0:
                 fill(self.species_color.x, self.species_color.y, self.species_color.z,60)
                 stroke(60)
                 pushMatrix()
-                translate(self.r.x, self.r.y-10)
-                ellipse(0,0,self.radius,self.radius)
+                translate(r.x, r.y-10)
+                ellipse(0,0,radius,radies)
                 popMatrix()
         else:
             if trails == 0:
@@ -97,87 +97,34 @@ class Site:
     def __init__():
         contains = []
     
-    def addBacterium(self, bacterium):
+    def addBacterium(bacterium):
         contains.append(bacterium)
     
-    def removeBacterium(self, bacterium):
+    def removeBacterium(bacterium):
         contains.remove(bacterium)
     
     def clearBacterium():
         contains = []
 
 class Grid:
-    sites = [[]]
+    sites = [][]
     grid_h = 0.0
     grid_w = 0.0
     
-    def __init__(temp_grid_height, temp_grid_width):
+    def __init__(self, temp_grid_height, temp_grid_width):
         grid_h = temp_grid_height
         grid_w = temp_grid_width
         
         sites = Site[int(global_width/grid_w)][int(global_height/grid_h)]
         for i in int(global_height/grid_h):
             #finish the rest of the for-loop
-            s = 1
+        
         
         
 
-window_width = 1200
-window_height = 400
-cell_radius = 20 #tweak for bigger or smaller bacteria
-max_num_cells = int((window_height/cell_radius) * (window_width/cell_radius)) 
-film = Biofilm()
-growth_rate = .05
-#amount_of_bacteria = max_num_cells - 500
-amount_of_bacteria = 500
-def setup():
-    size(window_width, window_height)
-    init()
-    print(max_num_cells)
-def draw():
-    line(0,0, mouseX, mouseY)
-    update()
-    stroke(255)
-    
-def init():
-    for i in range(int(amount_of_bacteria)):
-        x = width * random(1)
-        film.bacteria.append(Bacteria(PVector(x, height - height * random(.2), 0), cell_radius, rand_color(x/int((window_width/2))), False, False, growth_rate))
         
-def rand_color(x):
-    return PVector(255, 0, 0) if random(1) > x else PVector(0, 0, 255)
-
-def update():
-    for bacteria in film.bacteria:
-        bacteria.show()
+                        
         
-def keyPressed():
-    if(key == 'i'):
-        init()
-    if(key == 'a'):
-        print("Active Zone: ON")
-        delay(500)
-        active_zone_rheology_running = true
-        long_rheology_running = false
-        rheology_running = false
-        first_run = 1
-    if(key == 'b'):
-        initBlue()
-    if(key == 't'):
-        trails = 1-trails
-        background(0)
-    if(key == 'g'):
-        growing = 1 - growing
-    if(key == 'm'):
-        rheology_running = true
-        long_rheology_running = true
-        first_run = 1
-    if(key == 'k'):
-        killing = 1-killing
-    if(key == 'u'):
-        init_gaussian()
-    
-
 
 
 
