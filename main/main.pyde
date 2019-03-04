@@ -14,8 +14,8 @@ class Bacteria:
     times = []
     def __init__(self, r, radius, species_color, divided, killed, growth_rate):
         self.r = r
-        self.neighborhood = neighborhood
-        self.next_position = next_position
+        self.neighborhood = []
+        self.next_position = PVector()
         self.radius = radius;
         self.species_color = species_color
         self.divided = divided 
@@ -25,9 +25,9 @@ class Bacteria:
         self.r0 = PVector(r.x, r.y, r.z)
         self.rf = PVector(0,0,0)
         self.times = [] #list of floats
-    
+        self.trails = 0
         
-    def show():
+    def show(self):
         self.r.x = min(width, self.r.x)
         self.r.x = max(0, self.r.x)
         self.r.y = min(height, self.r.y)
@@ -38,16 +38,16 @@ class Bacteria:
                 fill(self.species_color.x/1.5, self.species_color.y, self.species_color.z+20, 50)
                 stroke(60)
                 pushMatrix()
-                translate(r.x, r.y-10)
-                ellipse(0,0,radius,radies)
+                translate(self.r.x, self.r.y-10)
+                ellipse(0,0,self.radius,self.radius)
                 popMatrix()
         elif self.species_color.z == 255:
             if self.trails == 0:
                 fill(self.species_color.x, self.species_color.y, self.species_color.z,60)
                 stroke(60)
                 pushMatrix()
-                translate(r.x, r.y-10)
-                ellipse(0,0,radius,radies)
+                translate(self.r.x, self.r.y-10)
+                ellipse(0,0,self.radius,self.radius)
                 popMatrix()
         else:
             if trails == 0:
@@ -71,7 +71,7 @@ class Bacteria:
 class Biofilm:
     bacteria = []
     
-    def __init__():
+    def __init__(self):
         bacteria = []
     
     def addBacterium(bacterium):
@@ -97,17 +97,17 @@ class Site:
     def __init__():
         contains = []
     
-    def addBacterium(bacterium):
+    def addBacterium(self, bacterium):
         contains.append(bacterium)
     
-    def removeBacterium(bacterium):
+    def removeBacterium(self, bacterium):
         contains.remove(bacterium)
     
     def clearBacterium():
         contains = []
 
 class Grid:
-    sites = [][]
+    sites = [[]]
     grid_h = 0.0
     grid_w = 0.0
     
@@ -118,8 +118,35 @@ class Grid:
         sites = Site[int(global_width/grid_w)][int(global_height/grid_h)]
         for i in int(global_height/grid_h):
             #finish the rest of the for-loop
+            s = 1
         
-                        
+        
+
+window_width = 1200
+window_height = 400
+cell_radius = 7
+max_num_cells = int((window_height/cell_radius) * (window_width/cell_radius)) 
+film = Biofilm()
+growth_rate = .05
+def setup():
+    size(window_width, window_height)
+    init()
+def draw():
+    line(0,0, mouseX, mouseY)
+    #update()
+    stroke(255)
+    
+def init():
+    for i in range(max_num_cells - 500):
+        x = width * random(1)
+        film.bacteria.append(Bacteria(PVector(x, height - height * random(.2), 0), cell_radius, rand_color(x/600), False, False, growth_rate))
+        
+def rand_color(x):
+    return PVector(255, 0, 0) if random(1) > x else PVector(0, 0, 255)
+
+def update():
+    for bacteria in film.bacteria:
+        bacteria.show()
         
 
 
