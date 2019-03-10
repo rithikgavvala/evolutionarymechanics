@@ -26,6 +26,7 @@ class Bacteria:
         self.rf = PVector(0,0,0)
         self.times = [] #list of floats
         self.trails = 0
+        self.enemy_count = 0
         
     def show(self):
         self.r.x = min(width, self.r.x)
@@ -130,6 +131,8 @@ film = Biofilm()
 growth_rate = .05
 #amount_of_bacteria = max_num_cells - 500
 amount_of_bacteria = 500
+gravity = PVector(0,38,0)
+counter = 0
 def setup():
     size(window_width, window_height)
     init()
@@ -148,8 +151,10 @@ def rand_color(x):
     return PVector(255, 0, 0) if random(1) > x else PVector(0, 0, 255)
 
 def update():
+    counter += 1
     for bacteria in film.bacteria:
         bacteria.show()
+        bacteria.r.add(movement(bacteria,neighbors,1.2 * cell_radius, k)).mult(eta*dt)
         
 def keyPressed():
     if(key == 'i'):
@@ -177,8 +182,25 @@ def keyPressed():
     if(key == 'u'):
         init_gaussian()
     
-
-
+    def movement(bug, bacteria_list, cut_off, k):
+        f = PVector(0,0,0)
+        bug.enemy_count = 0
+        for bacteria in bacteria_list:
+            disp = PVector.sub(bacteria.r, bug.r)
+            if abs(height - bug.r.y) < cell_radius:
+                f.add(PVector(0,height - bug.r.y, 0))
+            if disp.mag() < 1.1 * cell_radius:
+                f.add(disp.normalize().mult(-1).mult(1))
+            disp = PVector.sub(bacteria.r, bug.r)
+            if disp.mag() < cell_radius :
+                if disp.mag() != 0:
+                    f.add((disp.add(disp.mult((bug.radius+bacteria.radius)/disp.mag())).mult(-k)).mult(1))
+            if dis.mag() < cut_off:
+                if bacteria.species_color.x != bug.species_color.x and bacteria.species_color.y == 0:
+                    bug.enemy_count += 1
+        f.add(gravity)
+        return f
+ 
 
 
 
