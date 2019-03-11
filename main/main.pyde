@@ -99,13 +99,13 @@ class Site:
 
     
     def addBacterium(self, bacterium):
-        contains.append(bacterium)
+        self.contains.append(bacterium)
     
     def removeBacterium(self, bacterium):
-        contains.remove(bacterium)
+        self.contains.remove(bacterium)
     
-    def clearBacterium():
-        contains = []
+    def clearBacterium(self):
+        self.contains = []
 
 class Grid:
     sites = [[]]
@@ -121,15 +121,15 @@ class Grid:
                 self.sites[j][i] = Site()
         #print(self.sites[0])
         
-        def reset(self, bacteria):
-            for i in range(window_height / self.grid_h):
-                for j in range(window_width / self.grid_w):
-                    self.sites[i][j].clearBacterium()
+    def reset(self, bacteria):
+        for i in range(window_height / self.grid_h):
+            for j in range(window_width / self.grid_w):
+                self.sites[j][i].clearBacterium()
 
-            for b in bacteria:
-                i = pb(int(window_width / self.grid_w), int(b.r.x / self.grid_w))
-                j = pb(int(window_height / self.grid_h), int(b.r.y / self.grid_h))
-                self.sites[i][j].addBacterium(b)            
+        for b in bacteria:
+            i = pb(int(window_width / self.grid_w), int(b.r.x / self.grid_w))
+            j = pb(int(window_height / self.grid_h), int(b.r.y / self.grid_h))
+            self.sites[i][j].addBacterium(b)            
         
         
 
@@ -155,8 +155,9 @@ def setup():
     init()
     print(max_num_cells)
 def draw():
-    line(0,0, mouseX, mouseY)
+    
     update()
+    line(0,0, mouseX, mouseY)
     stroke(255)
     
 def init():
@@ -189,6 +190,8 @@ def movement(bug, bacteria_list, cut_off, k):
 
 def update():
     #counter += 1
+    #grid.reset(film.bacteria)
+    background(0)
     for bacteria in film.bacteria:
         print(bacteria.r)
         bacteria.show()
