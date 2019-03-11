@@ -111,15 +111,14 @@ class Grid:
     sites = [[]]
     
     def __init__(self, temp_grid_height, temp_grid_width):
-        self.sites = []
         self.grid_h = temp_grid_height
         self.grid_w = temp_grid_width
+        self.sites = [[None] * int(window_height / self.grid_h)] * int(window_width / self.grid_w)
         #sites = Site(int(window_width/grid_w),int(window_height/grid_h))
         
         for i in range(int(window_height/self.grid_h)):
-            self.sites.append([])
             for j in range(int(window_width/self.grid_w)):
-                self.sites[i].append(Site())
+                self.sites[j][i] = Site()
         #print(self.sites[0])
         
         def reset(self, bacteria):
@@ -180,7 +179,7 @@ def movement(bug, bacteria_list, cut_off, k):
         if disp.mag() < cell_radius :
             if disp.mag() != 0:
                 f.add((disp.add(disp.mult((bug.radius+bacteria.radius)/disp.mag())).mult(-k)).mult(1))
-        if dis.mag() < cut_off:
+        if disp.mag() < cut_off:
             if bacteria.species_color.x != bug.species_color.x and bacteria.species_color.y == 0:
                 bug.enemy_count += 1
     f.add(gravity)
@@ -211,9 +210,9 @@ def keyPressed():
     if(key == 'a'):
         print("Active Zone: ON")
         delay(500)
-        active_zone_rheology_running = true
-        long_rheology_running = false
-        rheology_running = false
+        active_zone_rheology_running = True
+        long_rheology_running = False
+        rheology_running = False
         first_run = 1
     if(key == 'b'):
         initBlue()
