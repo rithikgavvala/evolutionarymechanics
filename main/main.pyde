@@ -142,6 +142,7 @@ max_num_cells = int((window_height/cell_radius) * (window_width/cell_radius))
 film = Biofilm()
 growth_rate = .05
 #amount_of_bacteria = max_num_cells - 500
+#amount_of_bacteria = 500
 amount_of_bacteria = 500
 gravity = PVector(0,38,0)
 counter = 0
@@ -162,6 +163,7 @@ def init():
     for i in range(int(amount_of_bacteria)):
         x = width * random(1)
         film.bacteria.append(Bacteria(PVector(x, height - height * random(.2), 0), cell_radius, rand_color(x/int((window_width/2))), False, False, growth_rate))
+    
         
 def rand_color(x):
     return PVector(255, 0, 0) if random(1) > x else PVector(0, 0, 255)
@@ -188,21 +190,22 @@ def movement(bug, bacteria_list, cut_off, k):
 def update():
     #counter += 1
     for bacteria in film.bacteria:
+        print(bacteria.r)
         bacteria.show()
         neighbors = []
         i = int(floor(bacteria.r.x/grid_width))
         j = int(floor(bacteria.r.y/grid_height))
-        print(str(i) + "   "+ str(j))
-        print(len(grid.sites))
+        #print(bacteria.r)
         for k in range(3):
             for l in range(3):
-                print("k: "+ str(k) + "l: "+str(l))
                 t1 = pb(int(width/grid_width), i + k)
                 t2 = pb(int(height/grid_height), j + l)
-                print (str(t1) + "     " + str(t2))
                 for b in grid.sites[t1][t2].contains:
                     neighbors.append(b)
-        bacteria.r.add(movement(bacteria,neighbors,1.2 * cell_radius, k)).mult(eta*dt)
+        temp = movement(bacteria,neighbors,1.2 * cell_radius, k)
+    #print(temp)
+        bacteria.r.add((temp).mult(eta*dt))
+    #print(str(bacteria.r) + "     "+ str(temp) + str(type(bacteria.r)) + "     " + str(eta * dt))
         
 def keyPressed():
     if(key == 'i'):
