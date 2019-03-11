@@ -93,10 +93,10 @@ class Biofilm:
             num_cells = num_cells - 1
         
 class Site:
-    contains = []
     
-    def __init__():
-        contains = []
+    def __init__(self):
+        self.contains = []
+
     
     def addBacterium(self, bacterium):
         contains.append(bacterium)
@@ -109,23 +109,35 @@ class Site:
 
 class Grid:
     sites = [[]]
-    grid_h = 0.0
-    grid_w = 0.0
     
-    def __init__(temp_grid_height, temp_grid_width):
-        grid_h = temp_grid_height
-        grid_w = temp_grid_width
+    def __init__(self, temp_grid_height, temp_grid_width):
+        self.sites = [[]]
+        self.grid_h = temp_grid_height
+        self.grid_w = temp_grid_width
+        #sites = Site(int(window_width/grid_w),int(window_height/grid_h))
         
-        sites = Site[int(global_width/grid_w)][int(global_height/grid_h)]
-        for i in int(global_height/grid_h):
-            #finish the rest of the for-loop
-            s = 1
+        for i in range(int(window_height/self.grid_h)):
+            self.sites.append([])
+            for j in range(int(window_width/self.grid_w)):
+                self.sites[i].append(Site())
+                
+        def reset(self, bacteria):
+            for i in range(window_height / self.grid_h):
+                for j in range(window_width / self.grid_w):
+                    self.sites[i][j].clearBacterium()
+
+            for b in bacteria:
+                i = pb(int(window_width / self.grid_w), int(b.r.x / self.grid_w))
+                j = pb(int(window_height / self.grid_h), int(b.r.y / self.grid_h))
+                self.sites[i][j].addBacterium(b)            
         
         
 
 window_width = 1200
 window_height = 400
 cell_radius = 20 #tweak for bigger or smaller bacteria
+grid_width = cell_radius
+grid_height = cell_radius
 max_num_cells = int((window_height/cell_radius) * (window_width/cell_radius)) 
 film = Biofilm()
 growth_rate = .05
@@ -133,6 +145,8 @@ growth_rate = .05
 amount_of_bacteria = 500
 gravity = PVector(0,38,0)
 counter = 0
+grid = Grid(grid_width, grid_height)
+
 def setup():
     size(window_width, window_height)
     init()
@@ -151,9 +165,19 @@ def rand_color(x):
     return PVector(255, 0, 0) if random(1) > x else PVector(0, 0, 255)
 
 def update():
-    counter += 1
+    #counter += 1
     for bacteria in film.bacteria:
         bacteria.show()
+        neighbors = []
+        i = int(floor(bacteria.r.x/grid_width))
+        j = int(floor(bacteria.r.y/grid_height))
+        print(str(i) + "   "+ str(j))
+        print(len(grid.sites[0]))
+        for k in range(3):
+            for l in range(3):
+                print("k: "+ str(k) + "l: "+str(l))
+                for b in grid.sites[pb(int(width/grid_width), i + k)][int(height/grid_height), j + l].contains:
+                    neighbors.append(b)
         bacteria.r.add(movement(bacteria,neighbors,1.2 * cell_radius, k)).mult(eta*dt)
         
 def keyPressed():
@@ -201,7 +225,14 @@ def keyPressed():
         f.add(gravity)
         return f
  
-
+def pb(size_, x):
+    if type(x) == float:
+        intpart = (floor(x) + size_)%size_
+        floatpart = x - int(x)
+        return floatpart + intpart
+    elif type(x) == int:
+        return int((x+size_) % size_)
+    
 
 
 
