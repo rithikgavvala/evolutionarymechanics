@@ -111,7 +111,7 @@ class Grid:
     sites = [[]]
     
     def __init__(self, temp_grid_height, temp_grid_width):
-        self.sites = [[]]
+        self.sites = []
         self.grid_h = temp_grid_height
         self.grid_w = temp_grid_width
         #sites = Site(int(window_width/grid_w),int(window_height/grid_h))
@@ -120,7 +120,8 @@ class Grid:
             self.sites.append([])
             for j in range(int(window_width/self.grid_w)):
                 self.sites[i].append(Site())
-                
+        #print(self.sites[0])
+        
         def reset(self, bacteria):
             for i in range(window_height / self.grid_h):
                 for j in range(window_width / self.grid_w):
@@ -146,6 +147,8 @@ amount_of_bacteria = 500
 gravity = PVector(0,38,0)
 counter = 0
 grid = Grid(grid_width, grid_height)
+eta = .01
+dt = .071
 
 def setup():
     size(window_width, window_height)
@@ -163,6 +166,25 @@ def init():
         
 def rand_color(x):
     return PVector(255, 0, 0) if random(1) > x else PVector(0, 0, 255)
+  
+def movement(bug, bacteria_list, cut_off, k):
+    f = PVector(0,0,0)
+    bug.enemy_count = 0
+    for bacteria in bacteria_list:
+        disp = PVector.sub(bacteria.r, bug.r)
+        if abs(height - bug.r.y) < cell_radius:
+            f.add(PVector(0,height - bug.r.y, 0))
+        if disp.mag() < 1.1 * cell_radius:
+            f.add(disp.normalize().mult(-1).mult(1))
+        disp = PVector.sub(bacteria.r, bug.r)
+        if disp.mag() < cell_radius :
+            if disp.mag() != 0:
+                f.add((disp.add(disp.mult((bug.radius+bacteria.radius)/disp.mag())).mult(-k)).mult(1))
+        if dis.mag() < cut_off:
+            if bacteria.species_color.x != bug.species_color.x and bacteria.species_color.y == 0:
+                bug.enemy_count += 1
+    f.add(gravity)
+    return f
 
 def update():
     #counter += 1
@@ -172,11 +194,14 @@ def update():
         i = int(floor(bacteria.r.x/grid_width))
         j = int(floor(bacteria.r.y/grid_height))
         print(str(i) + "   "+ str(j))
-        print(len(grid.sites[0]))
+        print(len(grid.sites))
         for k in range(3):
             for l in range(3):
                 print("k: "+ str(k) + "l: "+str(l))
-                for b in grid.sites[pb(int(width/grid_width), i + k)][int(height/grid_height), j + l].contains:
+                t1 = pb(int(width/grid_width), i + k)
+                t2 = pb(int(height/grid_height), j + l)
+                print (str(t1) + "     " + str(t2))
+                for b in grid.sites[t1][t2].contains:
                     neighbors.append(b)
         bacteria.r.add(movement(bacteria,neighbors,1.2 * cell_radius, k)).mult(eta*dt)
         
@@ -205,25 +230,7 @@ def keyPressed():
         killing = 1-killing
     if(key == 'u'):
         init_gaussian()
-    
-    def movement(bug, bacteria_list, cut_off, k):
-        f = PVector(0,0,0)
-        bug.enemy_count = 0
-        for bacteria in bacteria_list:
-            disp = PVector.sub(bacteria.r, bug.r)
-            if abs(height - bug.r.y) < cell_radius:
-                f.add(PVector(0,height - bug.r.y, 0))
-            if disp.mag() < 1.1 * cell_radius:
-                f.add(disp.normalize().mult(-1).mult(1))
-            disp = PVector.sub(bacteria.r, bug.r)
-            if disp.mag() < cell_radius :
-                if disp.mag() != 0:
-                    f.add((disp.add(disp.mult((bug.radius+bacteria.radius)/disp.mag())).mult(-k)).mult(1))
-            if dis.mag() < cut_off:
-                if bacteria.species_color.x != bug.species_color.x and bacteria.species_color.y == 0:
-                    bug.enemy_count += 1
-        f.add(gravity)
-        return f
+  
  
 def pb(size_, x):
     if type(x) == float:
