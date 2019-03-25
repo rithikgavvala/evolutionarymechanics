@@ -1,17 +1,27 @@
+import math
+
+window_width = 1200
+window_height = 400
+num_cells = 0
+cell_radius = 20 #tweak for bigger or smaller bacteria
+grid_width = cell_radius
+grid_height = cell_radius
+max_num_cells = int((window_height/cell_radius) * (window_width/cell_radius)) 
+growth_rate = .05
+#amount_of_bacteria = max_num_cells - 500
+#amount_of_bacteria = 500
+amount_of_bacteria = 500
+gravity = PVector(0,38,0)
+counter = 0
+eta = .01
+dt = .071
+growing = 1
+bottom_only = False
+top_only = False
+kill_thresh = 4
+apop_thresh = .99
+killing = 0
 class Bacteria:
-    r = ""
-    neighborhood = [] # list of Bacterium
-    next_position = PVector() # list of ints representing the position
-    radius = ""
-    species_color = ""
-    divided = ""
-    killed = ""
-    clock = ""
-    growth_rate = ""
-    enemy_count = ""
-    r0 = ""
-    rf = ""
-    times = []
     def __init__(self, r, radius, species_color, divided, killed, growth_rate):
         self.r = r
         self.neighborhood = []
@@ -65,9 +75,9 @@ class Bacteria:
                 translate(self.r.x, self.r.y-10);
                 ellipse(0,0,self.radius/4,self.radius/4);
                 popMatrix();  
-    def grow():
+    def grow(self):
         if self.species_color.y == 0:
-            self.radius = self.radius + (2 * pi * dt * self.growth_rate)/self.radius
+            self.radius = self.radius + (2 * math.pi * dt * self.growth_rate)/self.radius
             
 class Biofilm:
     bacteria = []
@@ -75,22 +85,24 @@ class Biofilm:
     def __init__(self):
         bacteria = []
     
-    def addBacterium(bacterium):
-        bacteria.append(bacterium)
+    def addBacterium(self, bacterium):
+        self.bacteria.append(bacterium)
+        print("ok")
     
-    def removeBacterium(bacterium):
-        bacteria.remove(bacterium)
+    def removeBacterium(self, bacterium):
+        self.bacteria.remove(bacterium)
     
-    def update(to_divide, to_kill):
-        for i in len(to_divide):
-            to_divide[i].radius = cell_radius
-            if (num_cells < max_num_cells):
-                daughter = Bacterium #finish this constructor
-                bugs.addBacterium(daughter)
-                num_cells = num_cells + 1
-        for i in len(to_kill):
+    def update(self, to_divide, to_kill, cell_count):
+        for i in range(len(to_divide)):
+            cell_to_divide = to_divide[i]
+            cell_to_divide.radius = cell_radius
+            if (cell_count < max_num_cells):
+                daughter = Bacteria(PVector.add(cell_to_divide.r, PVector.random2D().mult(cell_to_divide.radius)), cell_radius, cell_to_divide.species_color, False, False, cell_to_divide.growth_rate) #finish this constructor
+                film.addBacterium(daughter)
+                cell_count += 1
+        for i in range(len(to_kill)):
             bugs.removeBacterium(b)
-            num_cells = num_cells - 1
+            cell_count -= 1
         
 class Site:
     
@@ -132,27 +144,12 @@ class Grid:
             self.sites[i][j].addBacterium(b)            
         
         
-
-window_width = 1200
-window_height = 400
-cell_radius = 20 #tweak for bigger or smaller bacteria
-grid_width = cell_radius
-grid_height = cell_radius
-max_num_cells = int((window_height/cell_radius) * (window_width/cell_radius)) 
 film = Biofilm()
-growth_rate = .05
-#amount_of_bacteria = max_num_cells - 500
-#amount_of_bacteria = 500
-amount_of_bacteria = 500
-gravity = PVector(0,38,0)
-counter = 0
 grid = Grid(grid_width, grid_height)
-eta = .01
-dt = .071
 
 def setup():
     size(window_width, window_height)
-    init()
+    init(num_cells)
     print(max_num_cells)
 def draw():
     
@@ -160,10 +157,11 @@ def draw():
     line(0,0, mouseX, mouseY)
     stroke(255)
     
-def init():
+def init(number_of_cells):
     for i in range(int(amount_of_bacteria)):
         x = width * random(1)
         film.bacteria.append(Bacteria(PVector(x, height - height * random(.2), 0), cell_radius, rand_color(x/int((window_width/2))), False, False, growth_rate))
+        number_of_cells += 1
     
         
 def rand_color(x):
@@ -192,9 +190,13 @@ def update():
     #counter += 1
     #grid.reset(film.bacteria)
     background(0)
+    
+
     for bacteria in film.bacteria:
-        print(bacteria.r)
         bacteria.show()
+        if num_cells < max_num_cells and growing == 1:
+            bacteria.grow()
+            
         neighbors = []
         i = int(floor(bacteria.r.x/grid_width))
         j = int(floor(bacteria.r.y/grid_height))
@@ -206,9 +208,51 @@ def update():
                 for b in grid.sites[t1][t2].contains:
                     neighbors.append(b)
         temp = movement(bacteria,neighbors,1.2 * cell_radius, k)
-    #print(temp)
-        bacteria.r.add((temp).mult(eta*dt))
-    #print(str(bacteria.r) + "     "+ str(temp) + str(type(bacteria.r)) + "     " + str(eta * dt))
+
+    bacteria.r.add((temp).mult(eta*dt))
+        
+    to_divide = []
+    ymin = height
+    for bacteria2 in film.bacteria:
+        if bacteria2.r.y < ymin:
+            ymin = bacteria2.r.y
+    pos = 0
+    while pos != len(film.bacteria):
+        current_bacteria = film.bacteria[pos]
+        if current_bacteria.radius < 1.2 * cell_radius:
+            if random(1) > .9:
+                if current_bacteria.species_color.y == 0:
+                    if bottom_only:
+                        h_div = height - ymin
+                        x_div = height - current_bacteria.r.y
+                        fact_div = 1 - float(math.pow(x_div/h_div, .25))
+                        if random(1) < fact_div:
+                            to_divide.append(current_bacteria)
+                    if top_only:
+                        for bacteria2 in film.bacteria:
+                            if bacteria2.r.y < ymin:
+                                ymin = bacteria2.r.y
+                        if current_bacteria.r.y - ymin < 6 * cell_radius: #the number six seems a bit arbitray
+                            to_divide.append(current_bacteria)
+                    to_divide.append(current_bacteria)
+        pos += 1
+    to_kill = []
+    pos = 0
+    while pos != len(film.bacteria):
+        current_bacteria = film.bacteria[pos]
+        if current_bacteria.enemy_count * random(1) > kill_thresh:
+            if current_bacteria.species_color.y == 0 and killing == 1:
+                to_kill.append(curret_bacteria)
+        if random(1) > apop_thresh and killing  ==  1 and one_species == False:
+            to_kill.append(current_bacteria)
+        pos += 1
+                
+    film.update(to_divide, to_kill, num_cells)
+                
+            
+                                 
+                        
+    
         
 def keyPressed():
     if(key == 'i'):
