@@ -1,16 +1,24 @@
 import math
+import os
 
-window_width = 1200
-window_height = 400
+file = open("C:\Users\Quadr\Documents\Processing\Simulation\evolutionarymechanics\main\parameters.txt", "r")
+#window_width = 1200
+#window_height = 400
+lines = file.readlines()
+window_width = int(lines[0])
+window_height = int(lines[1])
 num_cells = 0
-cell_radius = 20 #tweak for bigger or smaller bacteria
+#cell_radius = 0
+cell_radius = int(lines[3]) #tweak for bigger or smaller bacteria
 grid_width = cell_radius
 grid_height = cell_radius
 max_num_cells = int((window_height/cell_radius) * (window_width/cell_radius)) 
-growth_rate = .05
+#growth_rate = .05
+growth_rate = float(lines[4])
 #amount_of_bacteria = max_num_cells - 500
 #amount_of_bacteria = 500
-amount_of_bacteria = 700
+#amount_of_bacteria = 700
+amount_of_bacteria = int(lines[2])
 gravity = PVector(0,38,0)
 counter = 0
 eta = .01
