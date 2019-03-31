@@ -10,7 +10,7 @@ max_num_cells = int((window_height/cell_radius) * (window_width/cell_radius))
 growth_rate = .05
 #amount_of_bacteria = max_num_cells - 500
 #amount_of_bacteria = 500
-amount_of_bacteria = 500
+amount_of_bacteria = 700
 gravity = PVector(0,38,0)
 counter = 0
 eta = .01
@@ -20,7 +20,8 @@ bottom_only = False
 top_only = False
 kill_thresh = 4
 apop_thresh = .99
-killing = 0
+killing = 1
+one_species = False
 class Bacteria:
     def __init__(self, r, radius, species_color, divided, killed, growth_rate):
         self.r = r
@@ -87,7 +88,6 @@ class Biofilm:
     
     def addBacterium(self, bacterium):
         self.bacteria.append(bacterium)
-        print("ok")
     
     def removeBacterium(self, bacterium):
         self.bacteria.remove(bacterium)
@@ -100,8 +100,8 @@ class Biofilm:
                 daughter = Bacteria(PVector.add(cell_to_divide.r, PVector.random2D().mult(cell_to_divide.radius)), cell_radius, cell_to_divide.species_color, False, False, cell_to_divide.growth_rate) #finish this constructor
                 film.addBacterium(daughter)
                 cell_count += 1
-        for i in range(len(to_kill)):
-            bugs.removeBacterium(b)
+        for bug in to_kill:
+            film.removeBacterium(bug)
             cell_count -= 1
         
 class Site:
@@ -156,11 +156,12 @@ def draw():
     update()
     line(0,0, mouseX, mouseY)
     stroke(255)
+    print(random(1))
     
 def init(number_of_cells):
     for i in range(int(amount_of_bacteria)):
         x = width * random(1)
-        film.bacteria.append(Bacteria(PVector(x, height - height * random(.2), 0), cell_radius, rand_color(x/int((window_width/2))), False, False, growth_rate))
+        film.bacteria.append(Bacteria(PVector(x, height - height * random(.2), 0), cell_radius, rand_color(int(x/int((window_width/2)))), False, False, growth_rate))
         number_of_cells += 1
     
         
@@ -220,7 +221,8 @@ def update():
     while pos != len(film.bacteria):
         current_bacteria = film.bacteria[pos]
         if current_bacteria.radius < 1.2 * cell_radius:
-            if random(1) > .9:
+    
+            if 1/random(100) > .9:
                 if current_bacteria.species_color.y == 0:
                     if bottom_only:
                         h_div = height - ymin
