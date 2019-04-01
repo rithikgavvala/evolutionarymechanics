@@ -1,10 +1,13 @@
 import math
-import os
+import os, inspect
 
 file = open("C:\Users\Quadr\Documents\Processing\Simulation\evolutionarymechanics\main\parameters.txt", "r")
+
 #window_width = 1200
 #window_height = 400
 lines = file.readlines()
+#lines = loadStrings("parameters.txt")
+#print(lines)
 window_width = int(lines[0])
 window_height = int(lines[1])
 
@@ -19,7 +22,7 @@ growth_rate = float(lines[4])
 #amount_of_bacteria = 500
 #amount_of_bacteria = 700
 amount_of_bacteria = int(lines[2])
-num_cells = amount_of_bacteria
+num_cells = 0
 gravity = PVector(0,38,0)
 counter = 0
 eta = .01
@@ -164,7 +167,7 @@ def setup():
     init(num_cells)
 def draw():
     update()
-    line(0,0, mouseY, mouseX)
+    line(0,0, mouseX, mouseY)
     stroke(255)
     
 def init(number_of_cells):
@@ -260,7 +263,7 @@ def update():
         if random(1) > apop_thresh and killing  ==  1 and one_species == False:
             to_kill.append(current_bacteria)
         pos += 1
-                
+
     film.update(to_divide, to_kill, num_cells)
                 
             

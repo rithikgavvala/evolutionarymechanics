@@ -26,11 +26,16 @@ public class GUI extends Application {
     private ToggleGroup group2;
     private  RadioButton button3;
     private  RadioButton button4;
+    private  Scanner Path;
+    private String dataPath;
 
 
     public void start(Stage primaryStage) throws Exception {
         String execPath = Paths.get(".").toAbsolutePath().normalize().toString();
         Scanner scanner = new Scanner(new File(execPath + "\\main\\parameters.txt"));
+        //Scanner path = new Scanner(new File(execPath + "\\main\\path.txt"));
+        //dataPath = path.nextLine() +"\\data\\parameters.txt";
+        //Scanner scanner = new Scanner(new File(dataPath));
         scanner.useDelimiter("\n");
 
         window_width = new TextField(scanner.nextLine());
@@ -41,6 +46,7 @@ public class GUI extends Application {
         scanner.nextLine();
         scanner.nextLine();
         num_tracers = new TextField(scanner.nextLine());
+
 
         group = new ToggleGroup();
         button1 = new RadioButton("Yes");
@@ -73,10 +79,10 @@ public class GUI extends Application {
         run_sim.setOnAction(e -> {
             sim();
         });
-
+        //path.close();
         Scene scene = new Scene(vbox, 500,500);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Binary Converter");
+        primaryStage.setTitle("Simulation Parameters");
         primaryStage.setResizable(false);
         primaryStage.show();
 
@@ -87,6 +93,8 @@ public class GUI extends Application {
         try{
             String execPath = Paths.get(".").toAbsolutePath().normalize().toString();
             PrintWriter write = new PrintWriter(execPath + "\\main\\parameters.txt");
+
+            //PrintWriter write = new PrintWriter(dataPath);
             write.println(window_width.getText());
             write.println(window_height.getText());
             write.println(amount_of_Bacteria.getText());
