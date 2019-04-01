@@ -7,7 +7,7 @@ file = open("C:\Users\Quadr\Documents\Processing\Simulation\evolutionarymechanic
 lines = file.readlines()
 window_width = int(lines[0])
 window_height = int(lines[1])
-num_cells = 0
+
 #cell_radius = 0
 cell_radius = int(lines[3]) #tweak for bigger or smaller bacteria
 grid_width = cell_radius
@@ -19,17 +19,21 @@ growth_rate = float(lines[4])
 #amount_of_bacteria = 500
 #amount_of_bacteria = 700
 amount_of_bacteria = int(lines[2])
+num_cells = amount_of_bacteria
 gravity = PVector(0,38,0)
 counter = 0
 eta = .01
 dt = .071
 growing = 1
+dividing = int(lines[6])
 bottom_only = False
 top_only = False
 kill_thresh = 4
 apop_thresh = .99
-killing = 1
+#killing = 1
+killing = int(lines[5])
 one_species = False
+num_tracers = int(lines[7])
 class Bacteria:
     def __init__(self, r, radius, species_color, divided, killed, growth_rate):
         self.r = r
@@ -70,12 +74,12 @@ class Bacteria:
                 ellipse(0,0,self.radius,self.radius)
                 popMatrix()
         else:
-            if trails == 0:
+            if self.trails == 0:
                 fill(self.species_color.x, self.species_color.y, self.species_color.z)
                 noStroke()
                 pushMatrix()
                 translate(self.r.x, self.r.y-10)
-                ellipse(0,0,self.radius, self.radies)
+                ellipse(0,0,self.radius, self.radius)
                 popMatrix()
             else:
                 fill(self.species_color.x, self.species_color.y, self.species_color.z);
@@ -158,19 +162,19 @@ grid = Grid(grid_width, grid_height)
 def setup():
     size(window_width, window_height)
     init(num_cells)
-    print(max_num_cells)
 def draw():
-    
     update()
-    line(0,0, mouseX, mouseY)
+    line(0,0, mouseY, mouseX)
     stroke(255)
-    print(random(1))
     
 def init(number_of_cells):
     for i in range(int(amount_of_bacteria)):
         x = width * random(1)
         film.bacteria.append(Bacteria(PVector(x, height - height * random(.2), 0), cell_radius, rand_color(int(x/int((window_width/2)))), False, False, growth_rate))
         number_of_cells += 1
+    #consider makeing one cell of a diffrent coulour, green, and tracking that cell to see what happens to it and its species
+    for i in range(num_tracers):
+        film.bacteria.append(Bacteria(PVector(width*random(1), height - height * random(.25), 0), cell_radius, PVector(0,255,0), False, False, growth_rate))
     
         
 def rand_color(x):
@@ -218,7 +222,7 @@ def update():
                     neighbors.append(b)
         temp = movement(bacteria,neighbors,1.2 * cell_radius, k)
 
-    bacteria.r.add((temp).mult(eta*dt))
+        bacteria.r.add((temp).mult(eta*dt))
         
     to_divide = []
     ymin = height
@@ -230,7 +234,7 @@ def update():
         current_bacteria = film.bacteria[pos]
         if current_bacteria.radius < 1.2 * cell_radius:
     
-            if 1/random(100) > .9:
+            if 1/random(100) > .9 and dividing == 1:
                 if current_bacteria.species_color.y == 0:
                     if bottom_only:
                         h_div = height - ymin
