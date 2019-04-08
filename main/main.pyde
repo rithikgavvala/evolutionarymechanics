@@ -1,6 +1,8 @@
 import math
 import os, inspect
 
+#TODO implement cells sticking together in clusters as opposed to being individual units
+#TODO adding a positional gradiet so cells at top grow faster than cells at bottom or vice versa
 file = open("C:\Users\Quadr\Documents\Processing\Simulation\evolutionarymechanics\main\parameters.txt", "r")
 
 #window_width = 1200
@@ -37,6 +39,71 @@ apop_thresh = .99
 killing = int(lines[5])
 one_species = False
 num_tracers = int(lines[7])
+class Cluster():
+    def __init__(self, bacteria):
+        self.bacteria_group = [bacteria]
+        self.center = PVector(0,0,0)
+        self.leftmost_bacteria = bacteria
+        self.rightmost_bacteria = bacteria
+        self.highest_bacteria = bacteria
+        self.lowest_bacteria = bacteria
+        self.width_radius = 0
+        self.height_radius = 0
+        self.neighborhood = []
+        self.species_color = bacteria.species_color
+        self.growth_rate = bacteria.growth_rate
+        self.enemy_count = 0
+        self.divided = False
+        self.killed = False
+    def update(self):
+        left_bacteria = self.bacteria_group[0]
+        right_bacteria = self.bacteria_group[0]
+        top_bacteria = self.bacteria_group[0]
+        bottom_bacteria = self.bacteria_group[0]
+        for bacteria in self.bacteria_group[0:]:
+            if bacteria.r.x < left_bacteria.r.x:
+                left_bacteria = bacteria
+            if bacteria.r.x > right_bacteria.r.x:
+                right_bacteria = bacteria
+            if bacteria.r.y < left_bacteria.r.y:
+                top_bacteria = bacteria
+            if bacteria.r.y > right_bacteria.r.y:
+                bottom_bacteria = bacteria
+                
+        self.width_radius = (right_bacteria.x - left.bacteria.x +  2 * cell_radius) * .5
+        self.height_radius = (bottom_bacteria.y - top_bacteria.y +  2 * cell_radius) * .5
+        self.center = PVector(left_bacteria.r.x + width_radius, top_bacteria.r.y + height_radius, 0)
+        self.leftmost_bacteria = left_bacteria
+        self.rightmost_bacteria = right_bacteria
+        self.highest_bacteria = top_bacteria
+        self.lowest_bacteria = bottom_bacteria
+    
+    def show(self):
+        for bacteria in self.bacteria_group:
+            bacteria.show()
+    def grow(self):
+        for bacteria in self.bacteria_group:
+            bacteria.grow()
+    def divide(self):
+        if self.width_radius >= self.height_radius + cell_radius:
+            i = random(1)
+            splitting_bacteria = self.highest_bacteria if i < .5 else self.lowest_bacteria
+            if i < .5:
+                #find a better way to balance this. The goal is to try and make the the dividing process as even as possible. Basically if the sides get too wide
+                #new bacteria will grow on the top and bottoms and vice versa if the sides get too tall
+                #want to spawn the new bacteria with a poistion relative to the bacteria that lie on the extrema. Ex if i want to add a bacteria to the top
+                #we would want to subtract some value from the y value of the highest bacteria which would become the new y value for the new bacteria, effectivly making it the 
+                #highest. what to do with the x value in this case isnt the clearest. needs some testing a figuring out.
+                bacteria_group.append(Bacteria(PVector.sub(splitting_bacteria.r, PVector(random(.5) + , 0, 0))))
+            else:
+                update()
+        elif self.height_radius >= self.width_radius + cell_radius:
+        else:
+            if random(1) < .5:
+            else
+        
+            
+        
 class Bacteria:
     def __init__(self, r, radius, species_color, divided, killed, growth_rate):
         self.r = r
@@ -94,12 +161,14 @@ class Bacteria:
     def grow(self):
         if self.species_color.y == 0:
             self.radius = self.radius + (2 * math.pi * dt * self.growth_rate)/self.radius
+    
             
 class Biofilm:
     bacteria = []
     
     def __init__(self):
         bacteria = []
+        clusters = []
     
     def addBacterium(self, bacterium):
         self.bacteria.append(bacterium)
@@ -112,12 +181,16 @@ class Biofilm:
             cell_to_divide = to_divide[i]
             cell_to_divide.radius = cell_radius
             if (cell_count < max_num_cells):
-                daughter = Bacteria(PVector.add(cell_to_divide.r, PVector.random2D().mult(cell_to_divide.radius)), cell_radius, cell_to_divide.species_color, False, False, cell_to_divide.growth_rate) #finish this constructor
+                daughter = Bacteria(PVector.add(p.r, PVector.random2D().mult(cell_to_divide.radius)), cell_radius, cell_to_divide.species_color, False, False, cell_to_divide.growth_rate) #finish this constructor
                 film.addBacterium(daughter)
                 cell_count += 1
         for bug in to_kill:
             film.removeBacterium(bug)
             cell_count -= 1
+    def update_clusters(self, to_divide, to_kill, cell_count):
+        for i in range(len(to_divide))):
+            cluster_to_divide = to_divde[i]
+            
         
 class Site:
     
