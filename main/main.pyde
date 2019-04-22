@@ -39,6 +39,8 @@ apop_thresh = .99
 killing = int(lines[5])
 one_species = False
 num_tracers = int(lines[7])
+epsilon = 10
+r_0 = cell_radius
 class Cluster():
     def __init__(self, bacteria):
         self.bacteria_group = [bacteria]
@@ -94,14 +96,9 @@ class Cluster():
                 #want to spawn the new bacteria with a poistion relative to the bacteria that lie on the extrema. Ex if i want to add a bacteria to the top
                 #we would want to subtract some value from the y value of the highest bacteria which would become the new y value for the new bacteria, effectivly making it the 
                 #highest. what to do with the x value in this case isnt the clearest. needs some testing a figuring out.
-                bacteria_group.append(Bacteria(PVector.sub(splitting_bacteria.r, PVector(random(.5) + , 0, 0))))
-            else:
-                update()
-        elif self.height_radius >= self.width_radius + cell_radius:
-        else:
-            if random(1) < .5:
-            else
-        
+                #bacteria_group.append(Bacteria(PVector.sub(splitting_bacteria.r, PVector(random(.5) + , 0, 0))))
+                i+1
+   
             
         
 class Bacteria:
@@ -120,6 +117,8 @@ class Bacteria:
         self.times = [] #list of floats
         self.trails = 0
         self.enemy_count = 0
+        self.mother = None
+        self.daughters = []
         
     def show(self):
         self.r.x = min(width, self.r.x)
@@ -161,6 +160,11 @@ class Bacteria:
     def grow(self):
         if self.species_color.y == 0:
             self.radius = self.radius + (2 * math.pi * dt * self.growth_rate)/self.radius
+    def isDaughter(self, bacteria):
+        return bacteria in self.daughters
+    
+    def isMother(self, bacteria):
+        return self.mother == bacteria
     
             
 class Biofilm:
@@ -181,14 +185,16 @@ class Biofilm:
             cell_to_divide = to_divide[i]
             cell_to_divide.radius = cell_radius
             if (cell_count < max_num_cells):
-                daughter = Bacteria(PVector.add(p.r, PVector.random2D().mult(cell_to_divide.radius)), cell_radius, cell_to_divide.species_color, False, False, cell_to_divide.growth_rate) #finish this constructor
+                daughter = Bacteria(PVector.add(cell_to_divide.r, PVector.random2D().mult(cell_to_divide.radius)), cell_radius, cell_to_divide.species_color, False, False, cell_to_divide.growth_rate) #finish this constructor
+                cell_to_divide.daughters.append(daughter)
+                daughter.mother = cell_to_divide
                 film.addBacterium(daughter)
                 cell_count += 1
         for bug in to_kill:
             film.removeBacterium(bug)
             cell_count -= 1
     def update_clusters(self, to_divide, to_kill, cell_count):
-        for i in range(len(to_divide))):
+        for i in range(len(to_divide)):
             cluster_to_divide = to_divde[i]
             
         
@@ -202,10 +208,17 @@ class Site:
         self.contains.append(bacterium)
     
     def removeBacterium(self, bacterium):
-        self.contains.remove(bacterium)
+        if bacterium in self.contains:
+            self.contains.remove(bacterium)
     
     def clearBacterium(self):
         self.contains = []
+    
+    def updateNeighborhood(self):
+        for bacteria in self.contains:
+            temp = self.contains
+            temp.remove(bacteria)
+            bacteria.neighborhood = temp
 
 class Grid:
     sites = [[]]
@@ -219,17 +232,21 @@ class Grid:
         for i in range(int(window_height/self.grid_h)):
             for j in range(int(window_width/self.grid_w)):
                 self.sites[j][i] = Site()
-        #print(self.sites[0])
+        #print(len(self.sites))
         
     def reset(self, bacteria):
         for i in range(window_height / self.grid_h):
             for j in range(window_width / self.grid_w):
                 self.sites[j][i].clearBacterium()
-
+            
         for b in bacteria:
             i = pb(int(window_width / self.grid_w), int(b.r.x / self.grid_w))
             j = pb(int(window_height / self.grid_h), int(b.r.y / self.grid_h))
-            self.sites[i][j].addBacterium(b)            
+            self.sites[int(i)][int(j)].addBacterium(b)        
+             
+        #for i in range(window_height / self.grid_h):
+            #for j in range(window_width / self.grid_w):
+                #self.sites[j][i].updateNeighborhood()
         
         
 film = Biofilm()
@@ -240,6 +257,7 @@ def setup():
     init(num_cells)
 def draw():
     update()
+    stroke(255)
     line(0,0, mouseX, mouseY)
     stroke(255)
     
@@ -258,9 +276,22 @@ def rand_color(x):
   
 def movement(bug, bacteria_list, cut_off, k):
     f = PVector(0,0,0)
+    
     bug.enemy_count = 0
     for bacteria in bacteria_list:
         disp = PVector.sub(bacteria.r, bug.r)
+        magnitude = disp.mag()
+        if magnitude == 0:
+            magnitude = .01
+        f_attraction_mag = 12 * epsilon * ((r_0/magnitude) ** 12 * (1/magnitude) - (r_0/magnitude)**6 * (1/magnitude))
+        f_attraction_mag =  f_attraction_mag / gravity.mag()
+        #print(bug.isDaughter(bacteria))
+        if bug.isDaughter(bacteria):
+            angle = math.atan(disp.y/(disp.x+.0000001))
+            f_attraction = PVector(f_attraction_mag * math.cos(angle), f_attraction_mag * math.sin(angle), 0)
+            f.add(f_attraction)
+            #bug.species_color = PVector(0, 255, 0)
+            print(f_attraction)
         if abs(height - bug.r.y) < cell_radius:
             f.add(PVector(0,height - bug.r.y, 0))
         if disp.mag() < 1.1 * cell_radius:
@@ -277,10 +308,12 @@ def movement(bug, bacteria_list, cut_off, k):
 
 def update():
     #counter += 1
-    #grid.reset(film.bacteria)
+    #TODO work on grid.reset
     background(0)
+    grid.reset(film.bacteria)
+    #background(0)
     
-
+    #print(len(film.bacteria))
     for bacteria in film.bacteria:
         bacteria.show()
         if num_cells < max_num_cells and growing == 1:
@@ -290,12 +323,15 @@ def update():
         i = int(floor(bacteria.r.x/grid_width))
         j = int(floor(bacteria.r.y/grid_height))
         #print(bacteria.r)
-        for k in range(3):
-            for l in range(3):
+        for k in range(2):
+            for l in range(2):
                 t1 = pb(int(width/grid_width), i + k)
                 t2 = pb(int(height/grid_height), j + l)
-                for b in grid.sites[t1][t2].contains:
-                    neighbors.append(b)
+                neighbors = neighbors + grid.sites[t1][t2].contains
+                #for b in grid.sites[t1][t2].contains:
+                    #neighbors.append(b)
+        #print(len(neighbors))
+        #print(len(bacteria.daughters))
         temp = movement(bacteria,neighbors,1.2 * cell_radius, k)
 
         bacteria.r.add((temp).mult(eta*dt))
